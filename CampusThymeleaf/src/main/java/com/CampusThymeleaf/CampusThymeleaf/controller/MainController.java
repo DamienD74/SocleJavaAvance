@@ -1,7 +1,6 @@
 package com.CampusThymeleaf.CampusThymeleaf.controller;
 
 import java.util.List;
-import java.util.ArrayList; 
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.CampusThymeleaf.CampusThymeleaf.form.PersonnageForm;
@@ -14,19 +13,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.client.RestTemplate;
 
 @Controller
 public class MainController {
     
     private static final AtomicLong counter = new AtomicLong();
-    public static List<Personnage> personnageList = new ArrayList<Personnage>();
-
-    static {
-        personnageList.add(new Personnage(counter.incrementAndGet(), "Rubert", Personnage.Type.Magicien));
-        personnageList.add(new Personnage(counter.incrementAndGet(), "Prout", Personnage.Type.Guerrier));
-        personnageList.add(new Personnage(counter.incrementAndGet(), "Zidane", Personnage.Type.Guerrier));
-        personnageList.add(new Personnage(counter.incrementAndGet(), "Salomon", Personnage.Type.Magicien));
-    }
 
     @RequestMapping(value = { "/", "/index" }, method = RequestMethod.GET)
 	public String index(Model model) {
@@ -36,7 +28,10 @@ public class MainController {
 
     @RequestMapping(value = {"/personnages"}, method = RequestMethod.GET)
     public String personnages (Model model)
-    {           
+    {   
+        String url = "http://localhost:8081/personnages";
+        RestTemplate restTemplate = new RestTemplate();
+        List<Personnage> personnageList = restTemplate.getForObject(url, List.class);
         model.addAttribute("personnages",personnageList);
 
         return "personnages";
@@ -45,6 +40,10 @@ public class MainController {
     @RequestMapping(value = "/personnages/{id}", method = RequestMethod.GET)
     public Personnage personnage(@PathVariable final Integer id)
     {
+        String url = "http://localhost:8081/personnages/{id}";
+        RestTemplate restTemplate = new RestTemplate();
+        List<Personnage> personnageList = restTemplate.getForObject(url, List.class);
+
         if (id < personnageList.size())
         {
             return personnageList.get(id - 1);
@@ -64,21 +63,38 @@ public class MainController {
     }
 
     @RequestMapping(value = "/ajouterPersonnage", method = RequestMethod.POST)
-    public void addPersonnage(Model model, 
+    public String addPersonnage(Model model, 
     @ModelAttribute("personnageForm") PersonnageForm personnageForm)
     {
-        personnageList.add(new Personnage(counter.incrementAndGet(), personnageForm.getName(), personnageForm.getType()));
+        String url = "http://localhost:8081/personnages";
+        RestTemplate restTemplate = new RestTemplate();
+        List<Personnage> personnageList = restTemplate.getForObject(url, List.class);
+
+        Personnage personnage = new Personnage(counter.incrementAndGet(), personnageForm.getName(), personnageForm.getType());
+        personnageList.add(personnage);
+
+        restTemplate.postForObject(url, personnage, Personnage.class);
+
+        return "redirect:/personnages";
     }
     
     @RequestMapping(value = "/personnages/{id}", method = RequestMethod.PUT)
     public void modifyPersonnage(@PathVariable final Integer id, @RequestBody Personnage personnage)
     {
+        String url = "http://localhost:8081/personnages/{id}";
+        RestTemplate restTemplate = new RestTemplate();
+        List<Personnage> personnageList = restTemplate.getForObject(url, List.class);
+
         personnageList.set(id - 1, personnage);
     }
 
     @RequestMapping(value = "/personnages/{id}", method = RequestMethod.DELETE)
     public void modifyPersonnage(@PathVariable final Integer id)
     {
+        String url = "http://localhost:8081/personnages/{id}";
+        RestTemplate restTemplate = new RestTemplate();
+        List<Personnage> personnageList = restTemplate.getForObject(url, List.class);
+
         personnageList.remove((int)id - 1);
     }
 }
