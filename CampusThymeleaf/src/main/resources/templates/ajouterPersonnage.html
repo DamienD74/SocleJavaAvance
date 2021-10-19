@@ -1,0 +1,32 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Ajouter un personnage</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}" />
+</head>
+
+<body>
+    <h1>Créer un personnage:</h1>
+    <form th:action="@{/ajouterPersonnage}" th:object="${personnageForm}" method="POST">
+        Nom du personnage:
+        <input type="text" th:field="*{name}" />
+        <br />
+        Classe du personnage:
+        <select th:field="*{type}">
+            <option value="Choisis une classe">Choisis une classe</option>
+            <option value="Guerrier">Guerrier</option>
+            <option value="Magicien">Magicien</option>
+        </select>
+        <br />
+        <input type="submit" value="Créer" />
+    </form>
+
+    <br />
+    <div th:if="${errorMessage}" th:utext="${errorMessage}" style="color:red;font-style:italic;">
+        ...
+    </div>
+</body>
+
+</html>
