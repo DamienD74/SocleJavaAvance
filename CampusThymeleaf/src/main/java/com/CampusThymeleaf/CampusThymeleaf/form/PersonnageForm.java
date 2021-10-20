@@ -8,6 +8,18 @@ public class PersonnageForm {
     private String name;
     private Personnage.Type type;
 
+    public PersonnageForm()
+    {
+        
+    }
+
+    public PersonnageForm(long id, String name, Personnage.Type type)
+    {
+        this.id = id;
+        this.name = name;
+        this.type = type;
+    }
+
     public long getId()
     {
         return id;

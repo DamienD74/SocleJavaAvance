@@ -2,10 +2,15 @@ package com.campusjavatest.CampusJavaTest.Personnage;
 
 public class Personnage {
     
-    private final long id;
-    private final String name;
+    private long id;
+    private String name;
     public static enum Type {Guerrier, Magicien};
-    private final Type type;
+    private Type type;
+
+    public Personnage()
+    {
+
+    }
 
     public Personnage (Long id, String name, Type type)
     {

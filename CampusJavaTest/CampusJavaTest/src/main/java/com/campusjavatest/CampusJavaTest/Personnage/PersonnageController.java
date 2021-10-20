@@ -55,15 +55,15 @@ public class PersonnageController {
     }
 
     @Operation(summary = "Modification d'un personnage via un id")
-    @RequestMapping(value = "/personnages/{id}", method = RequestMethod.PUT)
-    public void modifyPersonnage(@PathVariable final Integer id, @RequestBody Personnage personnage)
+    @RequestMapping(value = "/personnages", method = RequestMethod.PUT)
+    public void modifyPersonnage(@RequestBody Personnage personnage)
     {
-        personnageList.set(id - 1, personnage);
+        personnageList.set((int)personnage.getId() - 1, personnage);
     }
 
     @Operation(summary = "Suppression d'un personnage via un id")
     @RequestMapping(value = "/personnages/{id}", method = RequestMethod.DELETE)
-    public void modifyPersonnage(@PathVariable final Integer id)
+    public void deletePersonnage(@PathVariable final Integer id)
     {
         personnageList.remove((int)id - 1);
     }

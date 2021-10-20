@@ -7,6 +7,11 @@ public class Personnage {
     public static enum Type {Guerrier, Magicien};
     private Type type;
 
+    public Personnage ()
+    {
+
+    }
+
     public Personnage (Long id, String name, Type type)
     {
         this.id = id;

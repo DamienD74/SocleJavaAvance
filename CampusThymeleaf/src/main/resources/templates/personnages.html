@@ -9,7 +9,7 @@
 
 <body>
     <h1>Liste des personnages</h1>
-    <a href="ajouterPersonnage">Ajouter personnage</a>
+    <a href="ajouterPersonnage">Ajouter personnage</a>    
     <br /><br />
     <div>
         <table border="1">
@@ -22,6 +22,7 @@
                 <td th:utext="${personnage.id}">...</td>
                 <td th:utext="${personnage.name}">...</td>
                 <td th:utext="${personnage.type}">...</td>
+                <td><a th:href="'/personnages/' + ${personnage.id}">Sélection</a></td>
             </tr>
         </table>
     </div>

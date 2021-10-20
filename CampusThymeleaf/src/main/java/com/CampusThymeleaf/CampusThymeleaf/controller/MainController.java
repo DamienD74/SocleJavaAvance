@@ -33,25 +33,18 @@ public class MainController {
         RestTemplate restTemplate = new RestTemplate();
         List<Personnage> personnageList = restTemplate.getForObject(url, List.class);
         model.addAttribute("personnages",personnageList);
-
         return "personnages";
     }
 
     @RequestMapping(value = "/personnages/{id}", method = RequestMethod.GET)
-    public Personnage personnage(@PathVariable final Integer id)
+    public String personnage(Model model, @PathVariable final Integer id)
     {
-        String url = "http://localhost:8081/personnages/{id}";
+        String url = "http://localhost:8081/personnages/"+ id +"";
         RestTemplate restTemplate = new RestTemplate();
-        List<Personnage> personnageList = restTemplate.getForObject(url, List.class);
+        Personnage personnage = restTemplate.getForObject(url, Personnage.class);
+        model.addAttribute("personnage",personnage);
 
-        if (id < personnageList.size())
-        {
-            return personnageList.get(id - 1);
-        }
-        else
-        {
-            return personnageList.get(personnageList.size() - 1);
-        }
+        return "detailPersonnage";
     }
 
     @RequestMapping(value = "/ajouterPersonnage", method = RequestMethod.GET)
@@ -78,23 +71,40 @@ public class MainController {
         return "redirect:/personnages";
     }
     
-    @RequestMapping(value = "/personnages/{id}", method = RequestMethod.PUT)
-    public void modifyPersonnage(@PathVariable final Integer id, @RequestBody Personnage personnage)
+    @RequestMapping(value = "/modifierPersonnages/{id}", method = RequestMethod.GET)
+    public String showModifyPersonnage(Model model, @PathVariable final Integer id)
     {
-        String url = "http://localhost:8081/personnages/{id}";
+        String url = "http://localhost:8081/personnages/"+ id +"";
         RestTemplate restTemplate = new RestTemplate();
-        List<Personnage> personnageList = restTemplate.getForObject(url, List.class);
+        Personnage personnage = restTemplate.getForObject(url, Personnage.class);
 
-        personnageList.set(id - 1, personnage);
+        PersonnageForm personnageForm = new PersonnageForm(personnage.getId(), personnage.getName(), personnage.getType());
+        model.addAttribute("personnageForm", personnageForm);
+        
+        return "modifierPersonnage";
     }
 
-    @RequestMapping(value = "/personnages/{id}", method = RequestMethod.DELETE)
-    public void modifyPersonnage(@PathVariable final Integer id)
+    @RequestMapping(value = "/modifierPersonnages", method = RequestMethod.POST)
+    public String modifyPersonnage(Model modem,
+    @ModelAttribute("personnageForm") PersonnageForm personnageForm)
     {
-        String url = "http://localhost:8081/personnages/{id}";
+        String url = "http://localhost:8081/personnages";
         RestTemplate restTemplate = new RestTemplate();
-        List<Personnage> personnageList = restTemplate.getForObject(url, List.class);
 
-        personnageList.remove((int)id - 1);
+        Personnage personnage = new Personnage(counter.incrementAndGet(), personnageForm.getName(), personnageForm.getType());
+
+        restTemplate.put(url, personnage, Personnage.class);
+
+        return "redirect:/personnages";
+    }
+
+    @RequestMapping(value = "/supprimerPersonnages/{id}", method = RequestMethod.GET)
+    public String deletePersonnage(Model model, @PathVariable final Integer id)
+    {
+        String url = "http://localhost:8081/personnages/" + id + "";
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.delete(url);
+
+        return "redirect:/personnages";
     }
 }
