@@ -1,9 +1,10 @@
 package com.campusjavatest.CampusJavaTest.Personnage;
 
-import java.util.List;
-import java.util.ArrayList; 
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.Optional;
 
+import com.campusjavatest.CampusJavaTest.repository.PersonnageRepository;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,55 +17,49 @@ import io.swagger.v3.oas.annotations.Operation;
 @RestController
 public class PersonnageController {
     
-    private static final AtomicLong counter = new AtomicLong();
-    public static List<Personnage> personnageList = new ArrayList<Personnage>();
-
-    static {
-        personnageList.add(new Personnage(counter.incrementAndGet(), "Rubert", Personnage.Type.Magicien));
-        personnageList.add(new Personnage(counter.incrementAndGet(), "Prout", Personnage.Type.Guerrier));
-        personnageList.add(new Personnage(counter.incrementAndGet(), "Zidane", Personnage.Type.Guerrier));
-        personnageList.add(new Personnage(counter.incrementAndGet(), "Salomon", Personnage.Type.Magicien));
-    }
+    @Autowired 
+    private PersonnageRepository personnageRepository;
 
     @Operation(summary = "Affichage de tout les personnages")
     @GetMapping("/personnages")
-    public List<Personnage> personnages ()
+    public Iterable<Personnage> personnages ()
     {        
-        return personnageList;
+        System.out.println(personnageRepository.findAll());
+        return personnageRepository.findAll();
     }
 
     @Operation(summary = "Affichage d'un personnage via un id")
     @RequestMapping(value = "/personnages/{id}", method = RequestMethod.GET)
-    public Personnage personnage(@PathVariable final Integer id)
+    public Optional<Personnage> personnage(@PathVariable final Long id)
     {
-        if (id < personnageList.size())
-        {
-            return personnageList.get(id - 1);
-        }
-        else
-        {
-            return personnageList.get(personnageList.size() - 1);
-        }
+        Optional <Personnage> personnage = personnageRepository.findById(id);
+        System.out.println(personnage);
+
+        return personnage;
     }
 
     @Operation(summary = "Ajout d'un personnage")
     @RequestMapping(value = "/personnages", method = RequestMethod.POST)
     public void addPersonnage(@RequestBody Personnage personnage)
     {
-        personnageList.add(personnage);
+        personnageRepository.save(personnage);
     }
 
     @Operation(summary = "Modification d'un personnage via un id")
     @RequestMapping(value = "/personnages", method = RequestMethod.PUT)
     public void modifyPersonnage(@RequestBody Personnage personnage)
     {
-        personnageList.set((int)personnage.getId() - 1, personnage);
+        System.out.println(personnage.getId());
+        Personnage personnageTable = personnageRepository.findById(personnage.getId()).get();
+        personnageTable.setName(personnage.getName());
+        personnageTable.setType(personnage.getType());
+        personnageRepository.save(personnageTable);
     }
 
     @Operation(summary = "Suppression d'un personnage via un id")
     @RequestMapping(value = "/personnages/{id}", method = RequestMethod.DELETE)
-    public void deletePersonnage(@PathVariable final Integer id)
+    public void deletePersonnage(@PathVariable final Long id)
     {
-        personnageList.remove((int)id - 1);
+        personnageRepository.deleteById(id);
     }
 }

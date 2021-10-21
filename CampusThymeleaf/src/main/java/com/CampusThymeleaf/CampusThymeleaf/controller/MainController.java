@@ -1,7 +1,6 @@
 package com.CampusThymeleaf.CampusThymeleaf.controller;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 import com.CampusThymeleaf.CampusThymeleaf.form.PersonnageForm;
 import com.CampusThymeleaf.CampusThymeleaf.model.Personnage;
@@ -10,15 +9,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.client.RestTemplate;
 
 @Controller
 public class MainController {
-    
-    private static final AtomicLong counter = new AtomicLong();
 
     @RequestMapping(value = { "/", "/index" }, method = RequestMethod.GET)
 	public String index(Model model) {
@@ -33,11 +29,12 @@ public class MainController {
         RestTemplate restTemplate = new RestTemplate();
         List<Personnage> personnageList = restTemplate.getForObject(url, List.class);
         model.addAttribute("personnages",personnageList);
+
         return "personnages";
     }
 
     @RequestMapping(value = "/personnages/{id}", method = RequestMethod.GET)
-    public String personnage(Model model, @PathVariable final Integer id)
+    public String personnage(Model model, @PathVariable final Long id)
     {
         String url = "http://localhost:8081/personnages/"+ id +"";
         RestTemplate restTemplate = new RestTemplate();
@@ -52,6 +49,7 @@ public class MainController {
     {
         PersonnageForm personnageForm = new PersonnageForm();
         model.addAttribute("personnageForm", personnageForm);
+        
         return "ajouterPersonnage";
     }
 
@@ -63,7 +61,7 @@ public class MainController {
         RestTemplate restTemplate = new RestTemplate();
         List<Personnage> personnageList = restTemplate.getForObject(url, List.class);
 
-        Personnage personnage = new Personnage(counter.incrementAndGet(), personnageForm.getName(), personnageForm.getType());
+        Personnage personnage = new Personnage(personnageForm.getId(), personnageForm.getName(), personnageForm.getType());
         personnageList.add(personnage);
 
         restTemplate.postForObject(url, personnage, Personnage.class);
@@ -72,7 +70,7 @@ public class MainController {
     }
     
     @RequestMapping(value = "/modifierPersonnages/{id}", method = RequestMethod.GET)
-    public String showModifyPersonnage(Model model, @PathVariable final Integer id)
+    public String showModifyPersonnage(Model model, @PathVariable final Long id)
     {
         String url = "http://localhost:8081/personnages/"+ id +"";
         RestTemplate restTemplate = new RestTemplate();
@@ -91,7 +89,7 @@ public class MainController {
         String url = "http://localhost:8081/personnages";
         RestTemplate restTemplate = new RestTemplate();
 
-        Personnage personnage = new Personnage(counter.incrementAndGet(), personnageForm.getName(), personnageForm.getType());
+        Personnage personnage = new Personnage(personnageForm.getId(), personnageForm.getName(), personnageForm.getType());
 
         restTemplate.put(url, personnage, Personnage.class);
 
@@ -99,7 +97,7 @@ public class MainController {
     }
 
     @RequestMapping(value = "/supprimerPersonnages/{id}", method = RequestMethod.GET)
-    public String deletePersonnage(Model model, @PathVariable final Integer id)
+    public String deletePersonnage(Model model, @PathVariable final Long id)
     {
         String url = "http://localhost:8081/personnages/" + id + "";
         RestTemplate restTemplate = new RestTemplate();
